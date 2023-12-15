@@ -3,7 +3,7 @@ import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";
 import Signin from "./pages/Signin.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
-import Signout from "./pages/Signout.jsx";
+import Signup from "./pages/Signup.jsx";
 import Offers from "./pages/Offers.jsx";
 import Header from "./components/Header.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -19,7 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/signin" element={<Signin />} />
-          <Route path="signout" element={<Signout />} />
+          <Route path="signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/offers" element={<Offers />} />
           <Route element={<PrivateRoutes />}>
