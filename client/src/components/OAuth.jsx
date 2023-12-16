@@ -1,9 +1,39 @@
 import React from "react";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { db } from "../firebase.js";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const OAuth = () => {
+  const navigate = useNavigate();
+  const onGoogleClick = async (e) => {
+    try {
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        await setDoc(docRef, {
+          name: user.displayName,
+          email: user.email,
+          timestamps: serverTimestamp(),
+        });
+      }
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Couldn't authorize with Google!");
+    }
+  };
   return (
     <div>
       <button
+        onClick={onGoogleClick}
         type="button"
         className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
       >
