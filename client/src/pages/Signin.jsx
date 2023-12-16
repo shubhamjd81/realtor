@@ -5,10 +5,13 @@ import { Link } from "react-router-dom";
 import { AiFillEye } from "react-icons/ai";
 import { AiFillEyeInvisible } from "react-icons/ai";
 import OAuth from "../components/OAuth";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
 
 const Signin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(true);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,11 +32,21 @@ const Signin = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log("clicked");
+
     try {
-      //
+      const auth = getAuth();
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      if (userCredentials.user) {
+        toast.success("Sign in successfully!");
+        navigate("/");
+      }
     } catch (error) {
-      console.log(error);
+      toast.error("Bad user credentials!");
     }
   };
 
