@@ -4,6 +4,14 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import OAuth from "../components/OAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase.js";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -13,6 +21,7 @@ const Signup = () => {
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
 
   const { name, email, password } = formData;
 
@@ -31,9 +40,27 @@ const Signup = () => {
     e.preventDefault();
     console.log("clicked");
     try {
-      //
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      updateProfile(auth.currentUser, { displayName: name });
+      const user = userCredential?.user;
+
+      // save user into DB
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+      formDataCopy.timestamps = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      toast.success("Sign-up was successful!");
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
+      setError(error.message);
+      toast.error("Something went wrong with registration!");
     }
   };
 
@@ -138,6 +165,7 @@ const Signup = () => {
                     />
                   )}
                 </div>
+                <p className="my-4">{error}</p>
               </div>
               <div>
                 <button
